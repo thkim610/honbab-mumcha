@@ -1,6 +1,7 @@
 package yougboyclub.honbabstop.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,7 @@ import yougboyclub.honbabstop.service.UserService;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/api/board")
 @RestController
@@ -38,8 +40,8 @@ public class BoardController {
                 .map(board -> new ResponseBoardDto(board))
                 .collect(Collectors.toList());
 
-        System.out.println("여기까지 오느라 수고했어1::" + boards);
-        System.out.println("여기까지 오느라 수고했어2::" + boardDtos);
+        log.info("boards : {}", boards);
+        log.info("boardDto : {}", boardDtos);
         return boardDtos;
     }
 
@@ -51,7 +53,7 @@ public class BoardController {
 
         User user = userService.findByEmail(board.getWriter().getEmail());
         // 유저 이메일 잘 들어오는지 확인
-        System.out.println("유저 : " + user);
+        log.info("user : {}", user);
 
         participantsService.createParticipant(Participants.builder()
                 .board(board)
@@ -67,44 +69,44 @@ public class BoardController {
     //모집글 조회(음식)
     @GetMapping("/food/{foodCategory}")
     public List<ResponseBoardDto> showBoardListByFood(@PathVariable String foodCategory) {
-        System.out.println("음식카테고리" + foodCategory);
+        log.info("foodcategry : {}", foodCategory);
         List<Board> boards = boardService.findByFoodCategory(foodCategory);
         List<ResponseBoardDto> boardDtos = boards.stream()
                 .map(board -> new ResponseBoardDto(board))
                 .collect(Collectors.toList());
-        System.out.println("여기까지 오느라 수고했어3::" + boards);
-        System.out.println("여기까지 오느라 수고했어4::" + boardDtos);
+        log.info("boards : {}", boards);
+        log.info("boardDto : {}", boardDtos);
         return boardDtos;
     }
 
     //모집글 조회(장소)
     @GetMapping("/place/{placeCategory}")
     public List<ResponseBoardDto> showBoardListByPlace(@PathVariable String placeCategory) {
-        System.out.println("장소카테고리" + placeCategory);
+        log.info("placeCategory : {}", placeCategory);
         List<Board> boards = boardService.findByPlaceCategory(placeCategory);
         List<ResponseBoardDto> boardDtos = boards.stream()
                 .map(board -> new ResponseBoardDto(board))
                 .collect(Collectors.toList());
-        System.out.println("여기까지 오느라 수고했어5::" + boards);
-        System.out.println("여기까지 오느라 수고했어6::" + boardDtos);
+        log.info("boards : {}", boards);
+        log.info("boardDto : {}", boardDtos);
         return boardDtos;
     }
 
     //모집글 상세 조회(개별 상세 조회)
     @GetMapping("/boardDetails/{id}")
     public ResponseBoardDto findBoardDetailById(@PathVariable Long id, @RequestHeader("User-Id") Long userId) {
-        System.out.println("헤더에 담겨온 userId: " + userId);
+        log.info("Header_userId : {}", userId);
         User currentUser = userService.findById(userId); // 현재 로그인한 사용자 정보를 가져옴
-        System.out.println("현재 로그인한 유저: " + currentUser);
+        log.info("currentUser : {}", currentUser);
         Board board = boardService.findByIdAndUser(id, currentUser); // 조회수 증가 로직이 포함된 서비스 호출
-        System.out.println("서비스 갔다온 보드: " + board);
+        log.info("board : {}", board);
         return new ResponseBoardDto(board);
     }
 
     //모집글 수정
     @PutMapping("/boardDetails/edit/{id}")
     public ResponseEntity<ResponseBoardDto> updateById(@PathVariable Long id, @RequestBody UpdateBoardRequest request) {
-        System.out.println("업데이트 보드 리퀘스트= " + request);
+        log.info("update request : {}", request);
         Board updateBoard = boardService.updateById(id, request);
         ResponseBoardDto responseBoardDto = new ResponseBoardDto(updateBoard);
         return ResponseEntity.ok().body(responseBoardDto);
@@ -125,13 +127,13 @@ public class BoardController {
 
     @GetMapping("/findby/{keyword}")
     public List<ResponseBoardDto> showBoardListByKeyword(@PathVariable String keyword) {
-        System.out.println("키워드::" + keyword);
+        log.info("keyword : {}", keyword);
         List<Board> boards = boardService.findByKeyword(keyword);
         List<ResponseBoardDto> boardDtos = boards.stream()
                 .map(board -> new ResponseBoardDto(board))
                 .collect(Collectors.toList());
-        System.out.println("여기까지 오느라 수고했어7::" + boards);
-        System.out.println("여기까지 오느라 수고했어8::" + boardDtos);
+        log.info("boards : {}", boards);
+        log.info("boardDto : {}", boardDtos);
         return boardDtos;
     }
 }
