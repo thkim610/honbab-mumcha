@@ -1,6 +1,7 @@
 package yougboyclub.honbabstop.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,7 @@ import yougboyclub.honbabstop.service.*;
 
 import java.util.List;
 
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/app")
@@ -33,7 +35,7 @@ public class ApplicationController {
         User user = userService.findByEmail(participantsDto.getEmail());
         Board board = boardService.findById(participantsDto.getBoardNo());
         Participants participants = participantsService.findByBoardAndUser(board, user);
-        System.out.println("null이냐 아니냐 그것이 문제로다1::" + participants);
+        log.info("participants : {}", participants);
         if (participants == null) {
             try {
                 participants = participantsDto.toEntity();
@@ -57,27 +59,13 @@ public class ApplicationController {
         } else return ResponseEntity.badRequest().body("참가 중이거나, 이미 신청한 파티입니다.");
     }
 
-    //파티신청 되어있는지 찾기
-//    @PostMapping("/find/participants")
-//    public int findParticipants(@RequestBody ParticipantsDto participantsDto) {
-//        //유저 검색 좀더 보완, 이메일뿐만 아니라 다른 키값으로도 검색할 수 있도록
-//        User user = userService.findByEmail(participantsDto.getEmail());
-//        Board board = boardService.findById(participantsDto.getBoardNo());
-//        Participants participants = participantsService.findByBoardAndUser(board, user);
-//
-//        //참가신청 이력이 있으면 status를 반환
-//        //[1:수락 0:대기 -1:거절 -99:참여정보 없음]
-//        if (participants != null) {
-//            return participants.getStatus();
-//        } else return -99;
-//    }
     @PostMapping("/find/participants")
     public ResponseEntity<List<Participants>> findParticipants(@RequestBody ParticipantsDto participantsDto) {
         //유저 검색 좀더 보완, 이메일뿐만 아니라 다른 키값으로도 검색할 수 있도록
         User user = userService.findByEmail(participantsDto.getEmail());
         //System.out.println("zzzzzz1" + user.getId());
         List<Participants> boards = participantsService.findByUser(user);
-        //System.out.println("zzzzzz2" + boards.get(0).getBoard().getId());
+        log.info("participants : {}", boards.get(0).getBoard().getId());
         //Participants participants = participantsService.findByBoardAndUser(board, user);
         return ResponseEntity.ok(boards);
         //참가신청 이력이 있으면 status를 반환
@@ -87,12 +75,12 @@ public class ApplicationController {
     @Transactional
     @PostMapping("/likes")
     public ResponseEntity<String> createLikes(@RequestBody LikesDto likesDto) {
-        System.out.println(likesDto);
+        log.info("likesDto : {}", likesDto);
         //유저 검색 좀더 보완, 이메일뿐만 아니라 다른 키값으로도 검색할 수 있도록
         User user = userService.findByEmail(likesDto.getEmail());
         Board board = boardService.findById(likesDto.getBoardNo());
         Likes likes = likesService.findByBoardAndUser(board, user);
-        System.out.println("null이냐 아니냐 그것이 문제로다2::" + likes);
+        log.info("likes : {}", likes);
         if (likes == null) {
             try {
                 likes = likesDto.toEntity();
@@ -109,7 +97,7 @@ public class ApplicationController {
     @Transactional
     @PostMapping("/dislikes")
     public ResponseEntity<String> deleteLikes(@RequestBody LikesDto likesDto) {
-        System.out.println(likesDto);
+        log.info("likesDto : {}", likesDto);
         //유저 검색 좀더 보완, 이메일뿐만 아니라 다른 키값으로도 검색할 수 있도록
         User user = userService.findByEmail(likesDto.getEmail());
         Board board = boardService.findById(likesDto.getBoardNo());
@@ -130,7 +118,6 @@ public class ApplicationController {
         //유저 검색 좀더 보완, 이메일뿐만 아니라 다른 키값으로도 검색할 수 있도록
         User user = userService.findByEmail(likesDto.getEmail());
         List<Likes> boards = likesService.findByUser(user);
-        //Participants participants = participantsService.findByBoardAndUser(board, user);
         return ResponseEntity.ok(boards);
         //참가신청 이력이 있으면 status를 반환
         //[1:수락 0:대기 -1:거절 -99:참여정보 없음]
@@ -141,15 +128,16 @@ public class ApplicationController {
         User user = userService.findById(userId);
         Board board = boardService.findById(id);
         Likes likes = likesService.findByBoardAndUser(board, user);
-        System.out.println("보드와 유저로 찾은 Likes: " + likes);
+        //보드와 유저로 찾은 likes
+        log.info("likesDto : {}", likes);
         if (likes != null) return true;
         else return false;
     }
 
     @PostMapping("/acceptparticipants")
     public ResponseEntity<String> acceptParticipants(@RequestBody ParticipantsDto participantsDto) {
-        System.out.println(participantsDto.getEmail());
-        System.out.println(participantsDto.getBoardNo());
+        log.info("participantsEmail : {}", participantsDto.getEmail());
+        log.info("participantsBoardNo : {}", participantsDto.getBoardNo());
         User user = userService.findByEmail(participantsDto.getEmail());
         Board board = boardService.findById(participantsDto.getBoardNo());
         Participants participants = participantsService.findByBoardAndUser(board, user);
@@ -157,7 +145,7 @@ public class ApplicationController {
             try {
                 participants.setStatus(1);
                 participantsService.editParticipant(participants);
-                System.out.print(participants);
+                log.info("participants : {}", participants);
                 return ResponseEntity.ok("Participated ");
             } catch (Exception e) {
                 return ResponseEntity.internalServerError().body("서버 오류: " + e.getMessage());
@@ -167,8 +155,8 @@ public class ApplicationController {
 
     @PostMapping("/denyparticipants")
     public ResponseEntity<String> denyParticipants(@RequestBody ParticipantsDto participantsDto) {
-        System.out.println(participantsDto.getEmail());
-        System.out.println(participantsDto.getBoardNo());
+        log.info("participantsEmail : {}", participantsDto.getEmail());
+        log.info("participantsBoardNo : {}", participantsDto.getBoardNo());
         User user = userService.findByEmail(participantsDto.getEmail());
         Board board = boardService.findById(participantsDto.getBoardNo());
         Participants participants = participantsService.findByBoardAndUser(board, user);
@@ -176,7 +164,7 @@ public class ApplicationController {
             try {
                 participants.setStatus(-1);
                 participantsService.editParticipant(participants);
-                System.out.print(participants);
+                log.info("participants : {}", participants);
                 return ResponseEntity.ok("Denied ");
             } catch (Exception e) {
                 return ResponseEntity.internalServerError().body("서버 오류: " + e.getMessage());
