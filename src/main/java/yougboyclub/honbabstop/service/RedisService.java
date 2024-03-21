@@ -1,6 +1,7 @@
 package yougboyclub.honbabstop.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
@@ -8,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RedisService {
@@ -18,8 +20,8 @@ public class RedisService {
 
     public void setValues(String key, String value, Duration expiration) {
         redisTemplate.opsForValue().set(key, value, expiration);
-        System.out.println("key = " + key);
-        System.out.println("value = " + value);
+        log.info("key = {}", key);
+        log.info("value = {}", value);
     }
 
     //key 파라미터로 받아 key를 기반으로 데이터를 조회한다.

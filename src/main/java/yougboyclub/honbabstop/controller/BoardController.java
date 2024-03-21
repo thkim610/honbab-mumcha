@@ -48,7 +48,7 @@ public class BoardController {
     //신규 모집글 작성
     @PostMapping("/new")
     public ResponseEntity<ResponseBoardDto> createBoard(@RequestBody RequestBoardDto dto) {
-        System.out.println("이건 컨트롤러로 들어오는 dto: " + dto);
+        log.info("createBoard dto = {} ", dto);
         Board board = boardService.createBoard(dto);
 
         User user = userService.findByEmail(board.getWriter().getEmail());
