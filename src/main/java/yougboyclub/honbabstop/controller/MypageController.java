@@ -1,6 +1,7 @@
 package yougboyclub.honbabstop.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import yougboyclub.honbabstop.domain.Board;
 import yougboyclub.honbabstop.domain.User;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/my")
 @RequiredArgsConstructor
@@ -70,9 +72,9 @@ public class MypageController {
         for (Long id : boardId) {
             Board partyBoard = boardService.findById(id);
             List<User> users = participantsService.findByBoardPartyUser(partyBoard);
-            System.out.println(users);
+            log.info("myPartyUsers = {}",users);
             List<ParticipantsUserInfoDto> userInfo = users.stream().map(ParticipantsUserInfoDto::new).collect(Collectors.toList());
-            System.out.println(userInfo);
+            log.info("myPartyUserInfo = {}",userInfo);
             temp.put(partyBoard.getTitle(), userInfo);
         }
 
