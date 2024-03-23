@@ -2,6 +2,7 @@ package yougboyclub.honbabstop.service;
 
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import yougboyclub.honbabstop.domain.Board;
 import yougboyclub.honbabstop.domain.User;
@@ -15,6 +16,7 @@ import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class BoardServiceImpl implements BoardService {
@@ -32,11 +34,12 @@ public class BoardServiceImpl implements BoardService {
         Optional<User> optionalUser = userRepository.findByEmail(requestBoardDto.getWriter().getEmail());
         if (optionalUser.isPresent()) {
             User getUser = optionalUser.get();
-            System.out.println("이건 겟유저다 이 짜식아:: " + getUser);
+            log.info("모집글 작성자 = {}", getUser);
             Board board = requestBoardDto.toEntity();
             board.setHit(0L);
             board.setWriter(getUser);
-            System.out.println("이건 세팅 다 끝난 보드~:: " + board);
+            log.info("엔터티 변경 완료 모집글 = {} ", board);
+            log.info("생성한 board_id = {}", board.getId());
             return boardRepository.save(board);
         }
         return null;
