@@ -31,6 +31,7 @@ public class Board extends BaseEntity {
   @Column(name = "content")
   private String content;
 
+  @DateTimeFormat(pattern = "HH:mm:ss")
   @Column(name = "time")
   private LocalTime time;
 
